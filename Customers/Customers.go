@@ -1,8 +1,8 @@
-package customer
+package customers
 
 import "gorm.io/gorm"
 
-type Details struct {
+type CustomerDetails struct {
 	gorm.Model
 
 	Firstname string `json:"firstname"`
@@ -11,4 +11,22 @@ type Details struct {
 	Phone     uint   `json:"phone"`
 	Location  string `json:"location"`
 	Password  string `"json:"password"`
+}
+
+func Get() {
+	var 
+}
+
+func GetId() {
+
+}
+func Create() {
+
+}
+
+func Update() {
+
+}
+func Delete() {
+
 }
