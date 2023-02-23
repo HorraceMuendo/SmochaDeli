@@ -14,7 +14,8 @@ type CustomerDetails struct {
 }
 
 func Get() {
-	var 
+	//var customerDetails [] CustomerDetails
+
 }
 
 func GetId() {
