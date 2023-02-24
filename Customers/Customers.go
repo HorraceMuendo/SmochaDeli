@@ -1,6 +1,10 @@
 package customers
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
+
+var db *gorm.DB
 
 type CustomerDetails struct {
 	gorm.Model
@@ -11,23 +15,4 @@ type CustomerDetails struct {
 	Phone     uint   `json:"phone"`
 	Location  string `json:"location"`
 	Password  string `"json:"password"`
-}
-
-func Get() {
-	//var customerDetails [] CustomerDetails
-
-}
-
-func GetId() {
-
-}
-func Create() {
-
-}
-
-func Update() {
-
-}
-func Delete() {
-
 }
