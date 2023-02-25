@@ -1,8 +1,6 @@
 package database
 
 import (
-	// _ "SmochaDeliveryApp/Customers/customers"
-	// "SmochaDeliverApp/customers"
 	customers "SmochaDeliveryApp/Customers"
 	"fmt"
 	"log"
@@ -27,12 +25,3 @@ func CustomerConn() *gorm.DB {
 	}
 	return db
 }
-
-//  var db *gorm.DB
-// var DNS = "host= user= password= dbname= port=  sslmode=disabled"
-// 	// connecting to the database
-// 	db, err := gorm.Open(postgres.Open(DNS), &gorm.Config{})
-// 	if err != nil{
-// 		fmt.Println("connection unsuccesful")
-// 	}
-// 	db.AutoMigrate()

@@ -15,7 +15,7 @@ func GetCustomer(c *fiber.Ctx) error {
 	return c.Status(200).JSON(customerDetails)
 }
 
-func GetCistomerById(c *fiber.Ctx) error {
+func GetCustomerById(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var customerDetail []customers.CustomerDetails
 	match := Cdb.Find(&customerDetail, id)

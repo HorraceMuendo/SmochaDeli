@@ -1,5 +1,6 @@
 package handlers
 
+// to-do get rider by location
 import (
 	riders "SmochaDeliveryApp/Riders"
 
