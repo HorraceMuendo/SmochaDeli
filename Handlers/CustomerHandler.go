@@ -3,7 +3,7 @@ package handlers
 import (
 	customers "SmochaDeliveryApp/Customers"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
@@ -19,10 +19,11 @@ func GetId(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var customerDetail []customers.CustomerDetails
 	match := db.Find(&customerDetail, id)
+
 	if match.RowsAffected == 0 {
 		return c.SendStatus(404)
 	}
-	return c.status(200).JSON(&customerDetail)
+	return c.Status(200).JSON(&customerDetail)
 
 }
 func Create(c *fiber.Ctx) error {
@@ -31,12 +32,27 @@ func Create(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 	db.Create(customer)
-	return c.SendStatus(200).JSON(customer)
+	return c.Status(200).JSON(customer)
+
 }
 
 func Update(c *fiber.Ctx) error {
+	customer := new(customers.CustomerDetails)
+	id := c.Params("id")
+	if err := c.BodyParser(customer); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	db.Where("id=?", id).Updates(&customer)
+	return c.Status(200).JSON(customer)
 
 }
 func Delete(c *fiber.Ctx) error {
+	var customer customers.CustomerDetails
+	id := c.Params("id")
+	delete := db.Delete(&customer, id)
 
+	if delete.RowsAffected == 0 {
+		return c.SendStatus(404)
+	}
+	return c.SendStatus(200)
 }
