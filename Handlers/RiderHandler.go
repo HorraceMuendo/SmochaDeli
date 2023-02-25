@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	//customers "SmochaDeliveryApp/Customers"
-
 	riders "SmochaDeliveryApp/Riders"
 
 	"github.com/gofiber/fiber/v2"
