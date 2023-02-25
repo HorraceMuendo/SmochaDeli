@@ -2,6 +2,7 @@ package database
 
 import (
 	customers "SmochaDeliveryApp/Customers"
+	riders "SmochaDeliveryApp/Riders"
 	"fmt"
 	"log"
 
@@ -19,7 +20,7 @@ func CustomerConn() *gorm.DB {
 		fmt.Println("connection unsuccesful")
 	}
 	// call the structs
-	err = db.AutoMigrate(&customers.CustomerDetails{})
+	err = db.AutoMigrate(&customers.CustomerDetails{}, &riders.RiderDetails{})
 	if err != nil {
 		log.Fatal("Automigration failed")
 	}
