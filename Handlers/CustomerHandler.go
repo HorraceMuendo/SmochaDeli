@@ -7,18 +7,18 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
+var Cdb *gorm.DB
 
-func Get(c *fiber.Ctx) error {
+func GetCustomer(c *fiber.Ctx) error {
 	var customerDetails []customers.CustomerDetails
-	db.Find(&customerDetails)
+	Cdb.Find(&customerDetails)
 	return c.Status(200).JSON(customerDetails)
 }
 
-func GetId(c *fiber.Ctx) error {
+func GetCistomerById(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var customerDetail []customers.CustomerDetails
-	match := db.Find(&customerDetail, id)
+	match := Cdb.Find(&customerDetail, id)
 
 	if match.RowsAffected == 0 {
 		return c.SendStatus(404)
@@ -26,30 +26,30 @@ func GetId(c *fiber.Ctx) error {
 	return c.Status(200).JSON(&customerDetail)
 
 }
-func Create(c *fiber.Ctx) error {
+func CreateCustomer(c *fiber.Ctx) error {
 	customer := new(customers.CustomerDetails)
 	if err := c.BodyParser(customer); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
-	db.Create(customer)
+	Cdb.Create(customer)
 	return c.Status(200).JSON(customer)
 
 }
 
-func Update(c *fiber.Ctx) error {
+func UpdateCustomer(c *fiber.Ctx) error {
 	customer := new(customers.CustomerDetails)
 	id := c.Params("id")
 	if err := c.BodyParser(customer); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
-	db.Where("id=?", id).Updates(&customer)
+	Cdb.Where("id=?", id).Updates(&customer)
 	return c.Status(200).JSON(customer)
 
 }
-func Delete(c *fiber.Ctx) error {
+func DeleteCustomer(c *fiber.Ctx) error {
 	var customer customers.CustomerDetails
 	id := c.Params("id")
-	delete := db.Delete(&customer, id)
+	delete := Cdb.Delete(&customer, id)
 
 	if delete.RowsAffected == 0 {
 		return c.SendStatus(404)
