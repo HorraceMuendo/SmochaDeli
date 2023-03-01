@@ -12,7 +12,7 @@ import (
 
 var db *gorm.DB
 
-func CustomerConn() *gorm.DB {
+func Conn() *gorm.DB {
 	DNS := "host= user= password= dbname= port=  sslmode=disabled"
 
 	db, err := gorm.Open(postgres.Open(DNS), &gorm.Config{})

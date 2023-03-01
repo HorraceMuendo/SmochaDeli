@@ -14,14 +14,14 @@ func Routes() {
 	})
 
 	api := app.Group("/api")
-
+	//customers endpoints
 	customer := api.Group("/customers")
 	customer.Get("/getCustomers", handlers.GetCustomer)
 	customer.Get("/getCustomerById", handlers.GetCustomerById)
 	customer.Post("/createCustomer", handlers.GetCustomer)
 	customer.Put("/updateCustomer", handlers.GetCustomer)
 	customer.Delete("/deleteCustomer", handlers.GetCustomer)
-
+	// riders endpoints
 	riders := api.Group("/riders")
 	riders.Get("/getRiders", handlers.GetRider)
 	riders.Get("/getRiderById", handlers.GetRiderById)
