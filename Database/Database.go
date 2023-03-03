@@ -13,7 +13,7 @@ import (
 var db *gorm.DB
 
 func Conn() *gorm.DB {
-	DNS := "host= user= password= dbname= port=  sslmode=disabled"
+	DNS := "host=localhost user=postgres password= dbname=smochadeliveryapp port=5432  sslmode=disabled"
 
 	db, err := gorm.Open(postgres.Open(DNS), &gorm.Config{})
 	if err != nil {
