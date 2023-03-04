@@ -13,13 +13,15 @@ import (
 var db *gorm.DB
 
 func Conn() *gorm.DB {
-	DNS := "host=localhost user=postgres password= dbname=smochadeliveryapp port=5432  sslmode=disabled"
+	DNS := "host=localhost user=postgres password= dbname=smochadeliveryapp port=5432  sslmode=disable"
 
 	db, err := gorm.Open(postgres.Open(DNS), &gorm.Config{})
 	if err != nil {
 		fmt.Println("connection unsuccesful")
 	}
+
 	// call the structs
+	//fmt.Println("Automigration succesful")
 	err = db.AutoMigrate(&customers.CustomerDetails{}, &riders.RiderDetails{})
 	if err != nil {
 		log.Fatal("Automigration failed")
