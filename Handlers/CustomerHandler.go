@@ -2,14 +2,13 @@ package handlers
 
 import (
 	customers "SmochaDeliveryApp/Customers"
+	database "SmochaDeliveryApp/Database"
 
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
-var Cdb *gorm.DB
-
 func GetCustomer(c *fiber.Ctx) error {
+	Cdb := database.DB
 	var customerDetails []customers.CustomerDetails
 	Cdb.Find(&customerDetails)
 	return c.Status(200).JSON(customerDetails)
@@ -17,6 +16,7 @@ func GetCustomer(c *fiber.Ctx) error {
 
 func GetCustomerById(c *fiber.Ctx) error {
 	id := c.Params("id")
+	Cdb := database.DB
 	var customerDetail []customers.CustomerDetails
 	match := Cdb.Find(&customerDetail, id)
 
@@ -27,6 +27,7 @@ func GetCustomerById(c *fiber.Ctx) error {
 
 }
 func CreateCustomer(c *fiber.Ctx) error {
+	Cdb := database.DB
 	customer := new(customers.CustomerDetails)
 	if err := c.BodyParser(customer); err != nil {
 		return c.Status(503).SendString(err.Error())
@@ -37,6 +38,7 @@ func CreateCustomer(c *fiber.Ctx) error {
 }
 
 func UpdateCustomer(c *fiber.Ctx) error {
+	Cdb := database.DB
 	customer := new(customers.CustomerDetails)
 	id := c.Params("id")
 	if err := c.BodyParser(customer); err != nil {
@@ -47,6 +49,7 @@ func UpdateCustomer(c *fiber.Ctx) error {
 
 }
 func DeleteCustomer(c *fiber.Ctx) error {
+	Cdb := database.DB
 	var customer customers.CustomerDetails
 	id := c.Params("id")
 	delete := Cdb.Delete(&customer, id)
