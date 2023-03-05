@@ -14,7 +14,7 @@ func main() {
 
 	//db connection call
 	database.Conn()
-	//defer database.DB.Close()
+
 	// routes/endponts call
 	routes.Routes()
 

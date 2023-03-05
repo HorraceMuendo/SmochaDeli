@@ -2,6 +2,7 @@ package routes
 
 import (
 	handlers "SmochaDeliveryApp/Handlers"
+	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -21,7 +22,7 @@ func Routes() {
 	customer.Post("/createCustomer", handlers.GetCustomer)
 	customer.Put("/updateCustomer", handlers.GetCustomer)
 	customer.Delete("/deleteCustomer", handlers.GetCustomer)
-	// riders endpoints
+	//riders endpoints
 	riders := api.Group("/riders")
 	riders.Get("/getRiders", handlers.GetRider)
 	riders.Get("/getRiderById", handlers.GetRiderById)
@@ -29,6 +30,6 @@ func Routes() {
 	riders.Put("/updateRider", handlers.UpdateRider)
 	riders.Delete("/deleteRider", handlers.DeleteRider)
 
-	//fmt.Println("starting server at port 3000")
+	fmt.Println("starting server at port 3000")
 	log.Fatal(app.Listen(":3000"))
 }

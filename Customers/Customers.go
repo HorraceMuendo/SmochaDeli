@@ -1,8 +1,6 @@
 package customers
 
-import (
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 type CustomerDetails struct {
 	gorm.Model
@@ -12,5 +10,5 @@ type CustomerDetails struct {
 	Email     string `json:"email"`
 	Phone     uint   `json:"phone"`
 	Location  string `json:"location"`
-	Password  string `"json:"password"`
+	Password  string `json:"password"`
 }
