@@ -1,8 +1,7 @@
 package database
 
 import (
-	customers "SmochaDeliveryApp/Customers"
-	riders "SmochaDeliveryApp/Riders"
+	"SmochaDeliveryApp/model"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -21,6 +20,6 @@ func Conn() {
 		fmt.Println("connection unsuccesful")
 	}
 
-	Db.AutoMigrate(&customers.CustomerDetails{}, &riders.RiderDetails{})
+	Db.AutoMigrate(&model.CustomerDetails{}, &model.RiderDetails{})
 	fmt.Println("Automigration succesful")
 }

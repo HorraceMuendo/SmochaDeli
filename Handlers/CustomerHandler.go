@@ -8,14 +8,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func SignUp(c *fiber.Ctx) {
+func SignUp(c *fiber.Ctx) error {
 
 	var CustomerSignup model.CustomerDetails
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(Customer.Password), 10)
+	hash, err := bcrypt.GenerateFromPassword([]byte(CustomerSignup.Password), 10)
 	if err != nil {
 		c.SendStatus(fiber.StatusBadRequest)
-		return
+
 	}
 	CustomerSignup = model.CustomerDetails{
 		Firstname: CustomerSignup.Firstname,
@@ -25,7 +25,10 @@ func SignUp(c *fiber.Ctx) {
 		Location:  CustomerSignup.Location,
 		Password:  string(hash),
 	}
-	database.Db.Create(&CustomerSignup)
+	addUser := database.Db.Create(&CustomerSignup)
+	if addUser.Error != nil {
+		c.Status(500).JSON("failed to create user")
+	}
 
-	return
+	return c.SendStatus(fiber.StatusOK)
 }
