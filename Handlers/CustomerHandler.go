@@ -48,24 +48,37 @@ func SignUp(c *fiber.Ctx) error {
 }
 
 func Login(c *fiber.Ctx) error {
-	//Email := c.Params("Email")
-	var CustomerLogin model.CustomerDetails
 
-	err := c.BodyParser(&CustomerLogin)
+	var body struct {
+		Firstname string
+		Lastname  string
+		Email     string
+		Phone     uint
+		Location  string
+		Password  string
+	}
+	err := c.BodyParser(&body)
 	if err != nil {
 		c.Status(400).JSON(fiber.Map{
 			"success ?": false,
-			"message":   "failed to bind to struct",
+			"message":   "bad request",
 		})
 	}
 
-	database.Db.First(&CustomerLogin.Email, "email = ?")
+	var CustomerLogin model.CustomerDetails
+	database.Db.First(&CustomerLogin.Email, "email = ?", body.Email)
 	if CustomerLogin.ID == 0 {
 		c.Status(400).JSON(fiber.Map{
 			"success ?": false,
 			"message":   "Invalid Email or Password",
 		})
 	}
-
+	err = bcrypt.CompareHashAndPassword([]byte(CustomerLogin.Password), []byte(body.Password))
+	if err != nil {
+		c.Status(400).JSON(fiber.Map{
+			"success ?": false,
+			"message":   "password does not match",
+		})
+	}
 	return
 }
