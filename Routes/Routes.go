@@ -18,8 +18,9 @@ func Routes() {
 	//customers endpoints
 	customer := api.Group("/customers")
 	customer.Post("/signup", handlers.SignUp)
+	customer.Post("/login/:Email", handlers.Login)
 	//riders endpoints
-	riders := api.Group("/riders")
+	//riders := api.Group("/riders")
 
 	fmt.Println("starting server at port 3000")
 	log.Fatal(app.Listen(":3000"))
