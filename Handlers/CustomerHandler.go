@@ -22,7 +22,8 @@ func SignUp(c *fiber.Ctx) error {
 	if err != nil {
 		c.Status(400).JSON(fiber.Map{
 			"success ?": false,
-			"message":   "bad request",
+			//change the message
+			"message": "bad request",
 		})
 	}
 
@@ -80,5 +81,5 @@ func Login(c *fiber.Ctx) error {
 			"message":   "password does not match",
 		})
 	}
-	return
+	return c.Status(200).JSON("login succesful...")
 }
