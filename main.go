@@ -6,10 +6,13 @@ package main
 
 import (
 	database "SmochaDeliveryApp/Database"
+	env "SmochaDeliveryApp/Env"
 	routes "SmochaDeliveryApp/Routes"
 )
 
 func main() {
+	//loading enviroment variables
+	env.EnvironmentVar()
 
 	//db connection call
 	database.Conn()

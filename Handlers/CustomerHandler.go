@@ -89,13 +89,14 @@ func Login(c *fiber.Ctx) error {
 		"subject": CustomerLogin.ID,
 		"expire":  time.Now().Add(time.Hour * 24 * 30).Unix(),
 	})
-	//signing and bla bla bla
-	tokenstr, err := token.SignedString(os.Getenv("KEY"))
+	//signing and encoding
+	tokenstr, err := token.SignedString([]byte(os.Getenv("KEY")))
 	if err != nil {
 		c.Status(400).JSON(fiber.Map{
 			"success ?": false,
-			"message":   "Invalid Email or Password",
+			"message":   "token creaton failure",
 		})
 	}
+	c.Status(200).JSON(tokenstr)
 	return c.Status(200).JSON("login succesful...")
 }
