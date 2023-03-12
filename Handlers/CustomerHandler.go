@@ -3,8 +3,11 @@ package handlers
 import (
 	database "SmochaDeliveryApp/Database"
 	"SmochaDeliveryApp/model"
+	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -79,6 +82,19 @@ func Login(c *fiber.Ctx) error {
 		c.Status(400).JSON(fiber.Map{
 			"success ?": false,
 			"message":   "password does not match",
+		})
+	}
+	//generating token
+	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+		"subject": CustomerLogin.ID,
+		"expire":  time.Now().Add(time.Hour * 24 * 30).Unix(),
+	})
+	//signing and bla bla bla
+	tokenstr, err := token.SignedString(os.Getenv("KEY"))
+	if err != nil {
+		c.Status(400).JSON(fiber.Map{
+			"success ?": false,
+			"message":   "Invalid Email or Password",
 		})
 	}
 	return c.Status(200).JSON("login succesful...")
