@@ -1,28 +1,26 @@
 package database
 
 import (
-	customers "SmochaDeliveryApp/Customers"
-	riders "SmochaDeliveryApp/Riders"
+	"SmochaDeliveryApp/model"
 	"fmt"
-	"log"
+	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
+var Db *gorm.DB
 
-func Conn() *gorm.DB {
-	DNS := "host= user= password= dbname= port=  sslmode=disabled"
+func Conn() {
+	var err error
 
-	db, err := gorm.Open(postgres.Open(DNS), &gorm.Config{})
+	DNS := os.Getenv("Connstr")
+
+	Db, err = gorm.Open(postgres.Open(DNS), &gorm.Config{})
 	if err != nil {
 		fmt.Println("connection unsuccesful")
 	}
-	// call the structs
-	err = db.AutoMigrate(&customers.CustomerDetails{}, &riders.RiderDetails{})
-	if err != nil {
-		log.Fatal("Automigration failed")
-	}
-	return db
+
+	Db.AutoMigrate(&model.CustomerDetails{}, &model.RiderDetails{})
+	fmt.Println("Automigration succesful")
 }

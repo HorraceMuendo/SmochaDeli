@@ -1,58 +1,102 @@
 package handlers
 
 import (
-	customers "SmochaDeliveryApp/Customers"
+	database "SmochaDeliveryApp/Database"
+	"SmochaDeliveryApp/model"
+	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
+	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
 )
 
-var Cdb *gorm.DB
+func SignUp(c *fiber.Ctx) error {
 
-func GetCustomer(c *fiber.Ctx) error {
-	var customerDetails []customers.CustomerDetails
-	Cdb.Find(&customerDetails)
-	return c.Status(200).JSON(customerDetails)
+	var body struct {
+		Firstname string
+		Lastname  string
+		Email     string
+		Phone     uint
+		Location  string
+		Password  string
+	}
+	err := c.BodyParser(&body)
+	if err != nil {
+		c.Status(400).JSON(fiber.Map{
+			"success ?": false,
+			//change the message
+			"message": "bad request",
+		})
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
+	if err != nil {
+		c.SendStatus(fiber.StatusBadRequest)
+
+	}
+	CustomerSignup := model.CustomerDetails{
+		Firstname: body.Firstname,
+		Lastname:  body.Lastname,
+		Email:     body.Email,
+		Phone:     body.Phone,
+		Location:  body.Location,
+		Password:  string(hash),
+	}
+	addUser := database.Db.Create(&CustomerSignup)
+	if addUser.Error != nil {
+		c.Status(500).JSON("failed to create user")
+	}
+
+	return c.SendStatus(fiber.StatusOK)
 }
 
-func GetCustomerById(c *fiber.Ctx) error {
-	id := c.Params("id")
-	var customerDetail []customers.CustomerDetails
-	match := Cdb.Find(&customerDetail, id)
+func Login(c *fiber.Ctx) error {
 
-	if match.RowsAffected == 0 {
-		return c.SendStatus(404)
+	var body struct {
+		Firstname string
+		Lastname  string
+		Email     string
+		Phone     uint
+		Location  string
+		Password  string
 	}
-	return c.Status(200).JSON(&customerDetail)
-
-}
-func CreateCustomer(c *fiber.Ctx) error {
-	customer := new(customers.CustomerDetails)
-	if err := c.BodyParser(customer); err != nil {
-		return c.Status(503).SendString(err.Error())
+	err := c.BodyParser(&body)
+	if err != nil {
+		c.Status(400).JSON(fiber.Map{
+			"success ?": false,
+			"message":   "bad request",
+		})
 	}
-	Cdb.Create(customer)
-	return c.Status(200).JSON(customer)
 
-}
-
-func UpdateCustomer(c *fiber.Ctx) error {
-	customer := new(customers.CustomerDetails)
-	id := c.Params("id")
-	if err := c.BodyParser(customer); err != nil {
-		return c.Status(503).SendString(err.Error())
+	var CustomerLogin model.CustomerDetails
+	database.Db.First(&CustomerLogin.Email, "email = ?", body.Email)
+	if CustomerLogin.ID == 0 {
+		c.Status(400).JSON(fiber.Map{
+			"success ?": false,
+			"message":   "Invalid Email or Password",
+		})
 	}
-	Cdb.Where("id=?", id).Updates(&customer)
-	return c.Status(200).JSON(customer)
-
-}
-func DeleteCustomer(c *fiber.Ctx) error {
-	var customer customers.CustomerDetails
-	id := c.Params("id")
-	delete := Cdb.Delete(&customer, id)
-
-	if delete.RowsAffected == 0 {
-		return c.SendStatus(404)
+	err = bcrypt.CompareHashAndPassword([]byte(CustomerLogin.Password), []byte(body.Password))
+	if err != nil {
+		c.Status(400).JSON(fiber.Map{
+			"success ?": false,
+			"message":   "password does not match",
+		})
 	}
-	return c.SendStatus(200)
+	//generating token
+	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+		"subject": CustomerLogin.ID,
+		"expire":  time.Now().Add(time.Hour * 24 * 30).Unix(),
+	})
+	//signing and encoding
+	tokenstr, err := token.SignedString([]byte(os.Getenv("KEY")))
+	if err != nil {
+		c.Status(400).JSON(fiber.Map{
+			"success ?": false,
+			"message":   "token creaton failure",
+		})
+	}
+	c.Status(200).JSON(tokenstr)
+	return c.Status(200).JSON("login succesful...")
 }
