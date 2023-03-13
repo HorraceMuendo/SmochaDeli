@@ -4,13 +4,14 @@ import (
 	handlers "SmochaDeliveryApp/Handlers"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func Routes() {
 	app := fiber.New(fiber.Config{
-		Prefork: true,
+		//Prefork: true,
 		AppName: "SmochaDeliveryApp",
 	})
 
@@ -18,12 +19,12 @@ func Routes() {
 	//customers endpoints
 	customer := api.Group("/customers")
 	customer.Post("/signup", handlers.SignUp)
-	customer.Post("/login/:Email", handlers.Login)
+	customer.Post("/login", handlers.Login)
 	//riders endpoints
 	//riders := api.Group("/riders")
 
 	fmt.Println("starting server at port 3000")
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(os.Getenv("PORT")))
 }
 
 // customer.Get("/getCustomers", handlers.GetCustomer)
