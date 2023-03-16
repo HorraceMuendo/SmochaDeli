@@ -106,5 +106,8 @@ func Login(c *fiber.Ctx) error {
 	//return c.Status(200).JSON("login succesful..."tokenstr)
 }
 func Validate(c *fiber.Ctx) error {
-	return
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "congratulations you're logged in",
+	})
 }
