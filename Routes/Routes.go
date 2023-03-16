@@ -2,6 +2,7 @@ package routes
 
 import (
 	handlers "SmochaDeliveryApp/Handlers"
+	middleware "SmochaDeliveryApp/Middleware"
 	"fmt"
 	"log"
 	"os"
@@ -16,6 +17,8 @@ func Routes() {
 	})
 
 	api := app.Group("/api")
+	middle := api.Group("/middleware")
+	middle.Get("/middleware", middleware.Middleware)
 	//customers endpoints
 	customer := api.Group("/customers")
 	customer.Post("/signup", handlers.SignUp)
