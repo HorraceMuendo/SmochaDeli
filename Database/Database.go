@@ -14,7 +14,7 @@ var Db *gorm.DB
 func Conn() {
 	var err error
 
-	DNS := os.Getenv("Connstr")
+	DNS := os.Getenv("ConnStr")
 
 	Db, err = gorm.Open(postgres.Open(DNS), &gorm.Config{})
 	if err != nil {

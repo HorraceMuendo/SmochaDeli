@@ -6,8 +6,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Middleware(c *fiber.Ctx) error {
+func AuthBridge(c *fiber.Ctx) error {
 
 	fmt.Println("in middleware")
-	return c.JSON("okay")
+	c.Next()
+	return c.SendStatus(fiber.StatusOK)
 }

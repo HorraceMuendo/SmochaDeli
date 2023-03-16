@@ -3,6 +3,7 @@ package handlers
 import (
 	database "SmochaDeliveryApp/Database"
 	"SmochaDeliveryApp/model"
+	"fmt"
 	"os"
 	"time"
 
@@ -23,11 +24,7 @@ func SignUp(c *fiber.Ctx) error {
 	}
 	err := c.BodyParser(&body)
 	if err != nil {
-		c.Status(400).JSON(fiber.Map{
-			"success ?": false,
-			//change the message
-			"message": "bad request",
-		})
+		fmt.Println("error")
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
@@ -97,6 +94,16 @@ func Login(c *fiber.Ctx) error {
 			"message":   "token creaton failure",
 		})
 	}
-	c.Status(200).JSON(tokenstr)
-	return c.Status(200).JSON("login succesful...")
+	fmt.Println("token string" + tokenstr)
+	cookie := new(fiber.Cookie)
+	cookie.Name = "Authorization"
+	cookie.Value = tokenstr
+	cookie.Expires = time.Now().Add(24 * time.Hour * 30 * 12)
+
+	return c.Status(200).JSON("logged in ...")
+
+	//return c.Status(200).JSON("login succesful..."tokenstr)
+}
+func Validate(c *fiber.Ctx) error {
+	return
 }
