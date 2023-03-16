@@ -99,6 +99,7 @@ func Login(c *fiber.Ctx) error {
 	cookie.Name = "Authorization"
 	cookie.Value = tokenstr
 	cookie.Expires = time.Now().Add(24 * time.Hour * 30 * 12)
+	c.Cookie(cookie)
 
 	return c.Status(200).JSON("logged in ...")
 
