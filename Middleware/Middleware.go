@@ -49,6 +49,7 @@ func AuthBridge(c *fiber.Ctx) error {
 			})
 		}
 		//attach to the request body
+		c.Locals("customer", &customer)
 
 		fmt.Println(claims["foo"], claims["nbf"])
 	} else {
