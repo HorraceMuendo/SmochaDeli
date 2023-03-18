@@ -5,6 +5,7 @@ import (
 	"SmochaDeliveryApp/model"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
@@ -29,11 +30,12 @@ func AuthBridge(c *fiber.Ctx) error {
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		//check expiration
-		// if time.Now().Unix() > claims["expire"]{
-		// 	c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-		// 		"message": "unauthorized",
-		// 	})
-		// }
+		expire := claims["expire"].(float64)
+		if float64(time.Now().Unix()) > expire {
+			c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"message": "unauthorized",
+			})
+		}
 
 		// get customer
 		var customer model.CustomerDetails
@@ -45,9 +47,8 @@ func AuthBridge(c *fiber.Ctx) error {
 		}
 		//attach to the request body
 
-		c.Set("customer", customer)
-
-		fmt.Println(claims["foo"], claims["nbf"])
+		c.
+			fmt.Println(claims["foo"], claims["nbf"])
 	} else {
 		c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"message": "unauthorized",
