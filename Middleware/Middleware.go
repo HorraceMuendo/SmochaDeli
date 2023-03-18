@@ -5,7 +5,6 @@ import (
 	"SmochaDeliveryApp/model"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
@@ -25,31 +24,33 @@ func AuthBridge(c *fiber.Ctx) error {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(os.Getenv("key")), nil
+		return []byte(os.Getenv("KEY")), nil
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		//check expiration
-		if time.Now().Unix() > claims["expires"] {
-			c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"message": err,
-			})
-		}
+		// if time.Now().Unix() > claims["expire"]{
+		// 	c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+		// 		"message": "unauthorized",
+		// 	})
+		// }
+
 		// get customer
 		var customer model.CustomerDetails
 		database.Db.First(&customer, claims["subject"])
 		if customer.ID == 0 {
 			c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"message": err,
+				"message": "failed to get user",
 			})
 		}
 		//attach to the request body
+
 		c.Set("customer", customer)
 
 		fmt.Println(claims["foo"], claims["nbf"])
 	} else {
 		c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": err,
+			"message": "unauthorized",
 		})
 	}
 
