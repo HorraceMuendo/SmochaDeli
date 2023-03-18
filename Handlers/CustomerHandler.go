@@ -1,5 +1,7 @@
 package handlers
 
+//to-do fix token generation
+
 import (
 	database "SmochaDeliveryApp/Database"
 	"SmochaDeliveryApp/model"
@@ -94,7 +96,7 @@ func Login(c *fiber.Ctx) error {
 			"message":   "token creaton failure",
 		})
 	}
-	fmt.Println("token string" + tokenString)
+	fmt.Println("token string : "+tokenString, token)
 	cookie := new(fiber.Cookie)
 	cookie.Name = "Authorization"
 	cookie.Value = tokenString
