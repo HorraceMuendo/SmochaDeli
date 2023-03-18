@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	database "SmochaDeliveryApp/Database"
+	"SmochaDeliveryApp/model"
 	"fmt"
 	"os"
 	"time"
@@ -33,6 +35,16 @@ func AuthBridge(c *fiber.Ctx) error {
 				"message": err,
 			})
 		}
+		// get customer
+		var customer model.CustomerDetails
+		database.Db.First(&customer, claims["subject"])
+		if customer.ID == 0 {
+			c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"message": err,
+			})
+		}
+		//attach to the request body
+		c.Set("customer", customer)
 
 		fmt.Println(claims["foo"], claims["nbf"])
 	} else {
