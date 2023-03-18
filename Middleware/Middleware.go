@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
@@ -22,15 +23,22 @@ func AuthBridge(c *fiber.Ctx) error {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-
-		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
 		return []byte(os.Getenv("key")), nil
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		//check expiration
+		if time.Now().Unix() > claims["expires"] {
+			c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"message": err,
+			})
+		}
+
 		fmt.Println(claims["foo"], claims["nbf"])
 	} else {
-		fmt.Println(err)
+		c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": err,
+		})
 	}
 
 	c.Next()
