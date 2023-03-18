@@ -5,6 +5,7 @@ import (
 	middleware "SmochaDeliveryApp/Middleware"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -27,7 +28,7 @@ func Routes() {
 	//riders := api.Group("/riders")
 
 	fmt.Println("starting server at port 3000")
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(os.Getenv("PORT")))
 }
 
 // customer.Get("/getCustomers", handlers.GetCustomer)
