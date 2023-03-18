@@ -27,6 +27,9 @@ func AuthBridge(c *fiber.Ctx) error {
 		}
 		return []byte(os.Getenv("KEY")), nil
 	})
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "fail", "message": fmt.Sprintf("invalidate token: %v", err)})
+	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		//check expiration
@@ -47,8 +50,7 @@ func AuthBridge(c *fiber.Ctx) error {
 		}
 		//attach to the request body
 
-		c.
-			fmt.Println(claims["foo"], claims["nbf"])
+		fmt.Println(claims["foo"], claims["nbf"])
 	} else {
 		c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"message": "unauthorized",
