@@ -87,17 +87,17 @@ func Login(c *fiber.Ctx) error {
 		"expire":  time.Now().Add(time.Hour * 24 * 30).Unix(),
 	})
 	//signing and encoding
-	tokenstr, err := token.SignedString([]byte(os.Getenv("KEY")))
+	tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
 	if err != nil {
 		c.Status(400).JSON(fiber.Map{
 			"success ?": false,
 			"message":   "token creaton failure",
 		})
 	}
-	fmt.Println("token string" + tokenstr)
+	fmt.Println("token string" + tokenString)
 	cookie := new(fiber.Cookie)
 	cookie.Name = "Authorization"
-	cookie.Value = tokenstr
+	cookie.Value = tokenString
 	cookie.Expires = time.Now().Add(24 * time.Hour * 30 * 12)
 	c.Cookie(cookie)
 
