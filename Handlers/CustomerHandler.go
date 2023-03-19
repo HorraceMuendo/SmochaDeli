@@ -83,18 +83,25 @@ func Login(c *fiber.Ctx) error {
 			"message":   "password does not match",
 		})
 	}
-	//generating token
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
-		"subject": CustomerLogin.ID,
-		"expire":  time.Now().Add(time.Hour * 24 * 30).Unix(),
+
+	// Create a new token object, specifying signing method and the claims
+	// you would like it to contain.
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": CustomerLogin.ID,
+		"exp": time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
 	})
-	tokenstr, err := token.SignedString(os.Getenv("KEY"))
-	if err != nil {
-		c.Status(400).JSON(fiber.Map{
-			"success ?": false,
-			"message":   "token creaton failure",
-		})
-	}
+
+	// Sign and get the complete encoded token as a string using the secret
+	tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
+
+	fmt.Println(tokenString, err)
+
+	//generating token
+	// token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+	// 	"subject": CustomerLogin.ID,
+	// 	"expire":  time.Now().Add(time.Hour * 24 * 30).Unix(),
+	// })
+
 	//signing and encoding
 	// tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
 	// if err != nil {
@@ -103,7 +110,7 @@ func Login(c *fiber.Ctx) error {
 	// 		"message":   "token creaton failure",
 	// 	})
 	// }
-	fmt.Println("signed token:"+tokenstr, "unsigned_token:", token)
+	//fmt.Println("signed token:"+tokenstr, "unsigned_token:", token)
 	// cookie := new(fiber.Cookie)
 	// cookie.Name = "Authorization"
 	// cookie.Value = tokenString
