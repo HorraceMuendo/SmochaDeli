@@ -88,22 +88,29 @@ func Login(c *fiber.Ctx) error {
 		"subject": CustomerLogin.ID,
 		"expire":  time.Now().Add(time.Hour * 24 * 30).Unix(),
 	})
-	//signing and encoding
-	tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
+	tokenstr, err := token.SignedString(os.Getenv("KEY"))
 	if err != nil {
 		c.Status(400).JSON(fiber.Map{
 			"success ?": false,
 			"message":   "token creaton failure",
 		})
 	}
-	fmt.Println("token string : "+tokenString, token)
-	cookie := new(fiber.Cookie)
-	cookie.Name = "Authorization"
-	cookie.Value = tokenString
-	cookie.Expires = time.Now().Add(24 * time.Hour * 30 * 12)
-	c.Cookie(cookie)
+	//signing and encoding
+	// tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
+	// if err != nil {
+	// 	c.Status(400).JSON(fiber.Map{
+	// 		"success ?": false,
+	// 		"message":   "token creaton failure",
+	// 	})
+	// }
+	fmt.Println("signed token:"+tokenstr, "unsigned_token:", token)
+	// cookie := new(fiber.Cookie)
+	// cookie.Name = "Authorization"
+	// cookie.Value = tokenString
+	// cookie.Expires = time.Now().Add(24 * time.Hour * 30 * 12)
+	// c.Cookie(cookie)
 
-	return c.Status(200).JSON("logged in ...")
+	return c.Status(200).JSON(tokenString)
 
 	//return c.Status(200).JSON("login succesful..."tokenstr)
 }
