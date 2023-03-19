@@ -84,40 +84,33 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	// Create a new token object, specifying signing method and the claims
-	// you would like it to contain.
+	//generating a token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": CustomerLogin.ID,
-		"exp": time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
+		"subject": CustomerLogin.ID,
+		"expire":  time.Now().Add(time.Hour * 24 * 30).Unix(),
 	})
 
-	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
+	// // Sign and get the complete encoded token as a string using the secret
+	// tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
 
-	fmt.Println(tokenString, err)
-
-	//generating token
-	// token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
-	// 	"subject": CustomerLogin.ID,
-	// 	"expire":  time.Now().Add(time.Hour * 24 * 30).Unix(),
-	// })
+	// fmt.Println(tokenString, err)
 
 	//signing and encoding
-	// tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
-	// if err != nil {
-	// 	c.Status(400).JSON(fiber.Map{
-	// 		"success ?": false,
-	// 		"message":   "token creaton failure",
-	// 	})
-	// }
-	//fmt.Println("signed token:"+tokenstr, "unsigned_token:", token)
-	// cookie := new(fiber.Cookie)
-	// cookie.Name = "Authorization"
-	// cookie.Value = tokenString
-	// cookie.Expires = time.Now().Add(24 * time.Hour * 30 * 12)
-	// c.Cookie(cookie)
+	tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
+	if err != nil {
+		c.Status(400).JSON(fiber.Map{
+			"success ?": false,
+			"message":   "token creaton failure",
+		})
+	}
+	//creating a cookie
+	cookie := new(fiber.Cookie)
+	cookie.Name = "Authorization"
+	cookie.Value = tokenString
+	cookie.Expires = time.Now().Add(24 * time.Hour * 30 * 12)
+	c.Cookie(cookie)
 
-	return c.Status(200).JSON(tokenString)
+	return c.Status(200).JSON("logged in ....")
 
 	//return c.Status(200).JSON("login succesful..."tokenstr)
 }
