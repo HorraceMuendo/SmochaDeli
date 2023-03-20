@@ -1,8 +1,12 @@
 package transactions
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -13,17 +17,47 @@ ACCESS_TOKEN:= os.Getenv("")
 //lipa na mpesa parameters
 ShortBusinessCode:=""
 Amount:=""
-PhoneNumber :=""
+PhoneNumber :="254729664004"
 AccountReference:="SMOCHADELIVERY"
 CallBackURL:=""
 TransactionDesc:="test"
 // encoding of consumer key and customer secret
 Consumerkey:= os.Getenv("")
 consumerSecret := os.Getenv("")
-Auth:=consumerSecret+Consumerkey
+Auth:=consumerSecret+":"+Consumerkey
+AuthEncode:=base64.StdEncoding.EncodeToString([]byte(Auth))
+//req body json
+
+RequestBody:=fmt.Sprintf(`{
+	"ShortBusinessCode": "%s",
+	"Amount":"%s",
+	"PhoneNumber" :"%s",
+	"AccountReference":"%s",
+	"CallBackURL":"%s",
+	"TransactionDesc":"%s",
+	"Tmestamp":"%s",
+	"Password":"%s"
+
+
+}`,ShortBusinessCode,Amount,PhoneNumber,AccountReference,CallBackURL,TransactionDesc,TimeStamp(),getPassword())
+
+
+
+
 
 }
-
+func getPassword() string {
+	//passphrase generated from smochadeliveryapp
+	passphrase:="ConquestpDefendvHarvestrHotp9"
+	envCode:= os.Getenv("ENVCODE")
+	data := passphrase+envCode
+	hash:= sha256.Sum256([]byte(data))
+	password := hex.EncodeToString(hash[:])
+	return password
+}
+func TimeStamp() string{
+	return time.Now().UTC().Format("20060102150405")
+}
 
 
 
