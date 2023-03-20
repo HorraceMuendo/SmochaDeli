@@ -51,13 +51,13 @@ func AuthBridge(c *fiber.Ctx) error {
 		//attach to the request body
 		c.Locals("customer", &customer)
 
-		// fmt.Println(claims["foo"], claims["nbf"])
+		fmt.Println(claims["foo"], claims["nbf"])
 	} else {
 		c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"message": "unauthorized",
 		})
 	}
-	//continue
+
 	c.Next()
 	return c.SendStatus(fiber.StatusOK)
 }
