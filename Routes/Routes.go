@@ -3,6 +3,7 @@ package routes
 import (
 	handlers "SmochaDeliveryApp/Handlers"
 	middleware "SmochaDeliveryApp/Middleware"
+	transactions "SmochaDeliveryApp/Transactions"
 	"fmt"
 	"log"
 	"os"
@@ -27,6 +28,9 @@ func Routes() {
 	//riders endpoints
 	//riders := api.Group("/riders")
 
+	//transactons endpoints
+	transaction := api.Group("/transactions")
+	transaction.Post("/paybill", transactions.DarajaApi)
 	fmt.Println("starting server at port 3000")
 	log.Fatal(app.Listen(os.Getenv("PORT")))
 }

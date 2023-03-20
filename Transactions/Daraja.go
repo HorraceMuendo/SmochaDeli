@@ -16,7 +16,7 @@ import (
 
 func DarajaApi(c *fiber.Ctx) error {
 	BASE_API := "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
-	ACCESS_TOKEN := os.Getenv("")
+	//ACCESS_TOKEN := os.Getenv("")
 
 	// lipa na mpesa parameters
 	ShortBusinessCode := ""
@@ -57,6 +57,7 @@ func DarajaApi(c *fiber.Ctx) error {
 	//set-up the request headers
 	req.Header.Set("Authorization", "Basic"+AuthEncode)
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Add("Api_", "application/json")
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Cache-Control", "no-cache")
 	// making the http req
