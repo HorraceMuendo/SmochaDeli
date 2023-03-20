@@ -1,12 +1,14 @@
 package transactions
-import(
+
+import (
 	"fmt"
 	"os"
+
+	"github.com/gofiber/fiber/v2"
 )
-
-
-BASE_API := "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
-ACCESS_TOKEN:="QEpJvcYmAQqO2BxNgVrM00L3QDJh"
+func DarajaApi(c* fiber.Ctx) error {
+	BASE_API := "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+ACCESS_TOKEN:= os.Getenv("")
 
 //lipa na mpesa parameters
 ShortBusinessCode:=""
@@ -16,7 +18,13 @@ AccountReference:="SMOCHADELIVERY"
 CallBackURL:=""
 TransactionDesc:="test"
 // encoding of consumer key and customer secret
-Consumerkey:= os.Get
+Consumerkey:= os.Getenv("")
+consumerSecret := os.Getenv("")
+Auth:=consumerSecret+Consumerkey
+
+}
+
+
 
 
 

@@ -10,7 +10,7 @@ import (
 	env "SmochaDeliveryApp/Env"
 	routes "SmochaDeliveryApp/Routes"
 
-	database "./SmochaDeliveryApp/Database"
+	database "SmochaDeliveryApp/Database"
 )
 
 func main() {
