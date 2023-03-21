@@ -1,8 +1,11 @@
 package handlers
 
+//to-do fix token generation
+
 import (
 	database "SmochaDeliveryApp/Database"
 	"SmochaDeliveryApp/model"
+	"fmt"
 	"os"
 	"time"
 
@@ -23,11 +26,7 @@ func SignUp(c *fiber.Ctx) error {
 	}
 	err := c.BodyParser(&body)
 	if err != nil {
-		c.Status(400).JSON(fiber.Map{
-			"success ?": false,
-			//change the message
-			"message": "bad request",
-		})
+		fmt.Println("error")
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
@@ -84,19 +83,40 @@ func Login(c *fiber.Ctx) error {
 			"message":   "password does not match",
 		})
 	}
-	//generating token
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+
+	//generating a token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"subject": CustomerLogin.ID,
 		"expire":  time.Now().Add(time.Hour * 24 * 30).Unix(),
 	})
+
+	// // Sign and get the complete encoded token as a string using the secret
+	// tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
+
+	// fmt.Println(tokenString, err)
+
 	//signing and encoding
-	tokenstr, err := token.SignedString([]byte(os.Getenv("KEY")))
+	tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
 	if err != nil {
 		c.Status(400).JSON(fiber.Map{
 			"success ?": false,
 			"message":   "token creaton failure",
 		})
 	}
-	c.Status(200).JSON(tokenstr)
-	return c.Status(200).JSON("login succesful...")
+	//creating a cookie
+	cookie := new(fiber.Cookie)
+	cookie.Name = "Authorization"
+	cookie.Value = tokenString
+	cookie.Expires = time.Now().Add(24 * time.Hour * 30 * 12)
+	c.Cookie(cookie)
+
+	return c.Status(200).JSON("logged in ....")
+
+	//return c.Status(200).JSON("login succesful..."tokenstr)
+}
+func Validate(c *fiber.Ctx) error {
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "congratulations you're logged in",
+	})
 }
