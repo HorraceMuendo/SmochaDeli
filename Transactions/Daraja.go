@@ -1,11 +1,9 @@
 package transactions
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -21,6 +19,8 @@ type AuthResp struct {
 
 func DarajaApi(c *fiber.Ctx) error {
 	BASE_API := "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+	TOKEN_API := "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
+
 	//ACCESS_TOKEN := os.Getenv("")
 
 	// lipa na mpesa parameters
@@ -51,7 +51,7 @@ func DarajaApi(c *fiber.Ctx) error {
 }`, ShortBusinessCode, Amount, PhoneNumber, AccountReference, CallBackURL, TransactionDesc, TimeStamp(), getPassword())
 
 	// creating the http request
-	req, err := http.NewRequest("POST", BASE_API, bytes.NewBufferString(RequestBody))
+	req, err := http.NewRequest("GET", TOKEN_API, nil)
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -59,35 +59,28 @@ func DarajaApi(c *fiber.Ctx) error {
 		})
 	}
 
+	req.SetBasicAuth(Consumerkey, consumerSecret)
+
 	//set-up the request headers
 	req.Header.Add("Authorization", "Basic"+AuthEncode)
 	//req.Header.Add("Authorization", "Bearer"+)
 	req.Header.Add("Content-Type", "application/json")
 	//req.Header.Add("Api_", "application/json")
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Cache-Control", "no-cache")
+	// req.Header.Add("Accept", "application/json")
+	// req.Header.Add("Cache-Control", "no-cache")
 	// sending the http req
 	client := &http.Client{}
-	resp, err := client.Do(req)
+	response, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Internal server Error",
 		})
 	}
-
-	var authResp AuthResp
-
-	err = json.NewDecoder(resp.Body).Decode(&authResp)
-	if err != nil {
-		fmt.Println("could not decode responsebody.......", err)
-	}
-
-	accessToken := authResp.ACCESS_TOKEN
-
+	defer response.Body.Close()
 	// read the response body
-	defer resp.Body.Close()
-	responsBody, err := ioutil.ReadAll(req.Body)
+
+	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -95,10 +88,10 @@ func DarajaApi(c *fiber.Ctx) error {
 		})
 	}
 
-	fmt.Println(string(responsBody))
+	fmt.Println(string(body))
 
 	return c.Status(200).JSON(fiber.Map{
-		"respbody": responsBody,
+		"respbody": body,
 	})
 }
 func getPassword() string {
