@@ -13,10 +13,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type AuthResp struct {
-	ACCESS_TOKEN string `json:"accesstoken"`
-}
-
 func DarajaApi(c *fiber.Ctx) error {
 	BASE_API := "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
 	TOKEN_API := "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
@@ -24,17 +20,21 @@ func DarajaApi(c *fiber.Ctx) error {
 	//ACCESS_TOKEN := os.Getenv("")
 
 	// lipa na mpesa parameters
+
 	ShortBusinessCode := "174379"
 	Amount := ""
 	PhoneNumber := ""
 	AccountReference := "SMOCHADELIVERY"
 	CallBackURL := ""
 	TransactionDesc := "test"
+
 	// encoding of consumer key and customer secret
+
 	Consumerkey := os.Getenv("CONSUMERKEY")
 	consumerSecret := os.Getenv("CONSUMERSECRET")
 	Auth := consumerSecret + ":" + Consumerkey
 	AuthEncode := base64.StdEncoding.EncodeToString([]byte(Auth))
+
 	//req body json
 
 	RequestBody := fmt.Sprintf(`{
@@ -51,6 +51,7 @@ func DarajaApi(c *fiber.Ctx) error {
 }`, ShortBusinessCode, Amount, PhoneNumber, AccountReference, CallBackURL, TransactionDesc, TimeStamp(), getPassword())
 
 	// creating the http request
+
 	req, err := http.NewRequest("GET", TOKEN_API, nil)
 	if err != nil {
 		fmt.Println(err)
@@ -62,9 +63,9 @@ func DarajaApi(c *fiber.Ctx) error {
 	req.SetBasicAuth(Consumerkey, consumerSecret)
 
 	//set-up the request headers
-	req.Header.Add("Authorization", "Basic"+AuthEncode)
+	//req.Header.Add("Authorization", "Basic"+AuthEncode)
 	//req.Header.Add("Authorization", "Bearer"+)
-	req.Header.Add("Content-Type", "application/json")
+	//req.Header.Add("Content-Type", "application/json")
 	//req.Header.Add("Api_", "application/json")
 	// req.Header.Add("Accept", "application/json")
 	// req.Header.Add("Cache-Control", "no-cache")
@@ -78,6 +79,7 @@ func DarajaApi(c *fiber.Ctx) error {
 		})
 	}
 	defer response.Body.Close()
+
 	// read the response body
 
 	body, err := ioutil.ReadAll(req.Body)
