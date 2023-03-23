@@ -4,8 +4,8 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -37,7 +37,7 @@ func DarajaApi(c *fiber.Ctx) error {
 	ShortBusinessCode := "174379"
 	Amount := ""
 	PhoneNumber := ""
-	AccountReference := "SMOCHADELIVERY"
+	AccountReference := "SMOCHADELI"
 	CallBackURL := ""
 	TransactionDesc := "test"
 
@@ -62,26 +62,31 @@ func DarajaApi(c *fiber.Ctx) error {
 	req.SetBasicAuth(Consumerkey, consumerSecret)
 
 	client := &http.Client{}
-	response, err := client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Internal server Error",
 		})
 	}
-	defer response.Body.Close()
+	defer resp.Body.Close()
 
 	// read the response body
 
-	body, err := ioutil.ReadAll(req.Body)
+	var response map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
-		fmt.Println(err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Internal server Error",
-		})
+		panic(err)
 	}
 
-	fmt.Println(string(body))
+	// Extract the access token from the response
+	accessToken, ok := response["access_token"].(string)
+	if !ok {
+		panic("Access token not found in response")
+	}
+
+	// Print the access token
+	fmt.Println("Access token:", accessToken)
 
 	//authenticaton encoding
 	AuthEncode := base64.StdEncoding.EncodeToString([]byte(Auth))
@@ -99,6 +104,8 @@ func DarajaApi(c *fiber.Ctx) error {
 	
 	
 	}`, ShortBusinessCode, Amount, PhoneNumber, AccountReference, CallBackURL, TransactionDesc, TimeStamp(), getPassword())
+
+	//TO-DO send a post request bearing the token,requestbody and
 
 	//***setting up the request headers***
 
