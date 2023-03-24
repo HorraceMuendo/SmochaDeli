@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -13,7 +14,6 @@ import (
 )
 
 func getPassword() string {
-	//passphrase generated from smochadeliveryapp
 	passphrase := os.Getenv("PASSPRHASE")
 	data := "174379" + passphrase + TimeStamp()
 	password := base64.StdEncoding.EncodeToString([]byte(data))
@@ -27,10 +27,6 @@ func DarajaApi(c *fiber.Ctx) error {
 	BASE_API := "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
 	TOKEN_API := "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
 
-	//ACCESS_TOKEN := os.Getenv("")
-
-	// lipa na mpesa parameters
-
 	ShortBusinessCode := "174379"
 	Amount := ""
 	PhoneNumber := ""
@@ -38,13 +34,8 @@ func DarajaApi(c *fiber.Ctx) error {
 	CallBackURL := ""
 	TransactionDesc := "test"
 
-	// encoding of consumer key and customer secret
-
 	Consumerkey := os.Getenv("CONSUMERKEY")
 	consumerSecret := os.Getenv("CONSUMERSECRET")
-	//Auth := consumerSecret + ":" + Consumerkey
-
-	//req body json
 
 	// creating the http request
 
@@ -85,9 +76,6 @@ func DarajaApi(c *fiber.Ctx) error {
 	// Print the access token
 	fmt.Println("Access token:", accessToken)
 
-	//authenticaton encoding
-	//AuthEncode := base64.StdEncoding.EncodeToString([]byte(Auth))
-
 	//writing the post request
 	RequestBody := fmt.Sprintf(`{
 		"ShortBusinessCode": "%s",
@@ -99,7 +87,6 @@ func DarajaApi(c *fiber.Ctx) error {
 		"Timestamp":"%s",
 		"Password":"%s"
 	
-	
 	}`, ShortBusinessCode, Amount, PhoneNumber, AccountReference, CallBackURL, TransactionDesc, TimeStamp(), getPassword())
 
 	//TO-DO send a post request bearing the token,requestbody and
@@ -107,15 +94,31 @@ func DarajaApi(c *fiber.Ctx) error {
 	req2, err := http.NewRequest("POST", BASE_API, bytes.NewBufferString(RequestBody))
 	if err != nil {
 		fmt.Println(err)
-		// return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-		// 	"message": "Internal server Error.....",
-		// })
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Internal server Error.....",
+		})
 	}
+	req2.Close=true
+
 	req2.Header.Set("Authorization", "Bearer"+accessToken)
 	req2.Header.Set("Content-Type", "application/json")
 	req2.Header.Add("Accept", "application/json")
 	req2.Header.Add("Cache-Control", "no-cache")
 	// sending the http req
+	resp2,err := client.Do(req2)
+	if err != nil {
+		fmt.Println(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Internal server Error.....",
+		})
+		defer resp2.Body.Close()
+		body,err := ioutil.ReadAll(resp2)
+		if err != nil {
+			fmt.Println(err)
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": "Internal server Error.....",
+			})
+			fmt.Println(string(body))
 
 	return c.Status(200).JSON(fiber.Map{
 		"message": "transaction was succesful......",
