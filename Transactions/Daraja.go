@@ -1,9 +1,8 @@
 package transactions
 
 import (
-	"crypto/sha256"
+	"bytes"
 	"encoding/base64"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -15,11 +14,9 @@ import (
 
 func getPassword() string {
 	//passphrase generated from smochadeliveryapp
-	passphrase := "ConquestpDefendvHarvestrHotp9"
-	envCode := os.Getenv("ENVCODE")
-	data := passphrase + envCode
-	hash := sha256.Sum256([]byte(data))
-	password := hex.EncodeToString(hash[:])
+	passphrase := os.Getenv("PASSPRHASE")
+	data := "174379" + passphrase + TimeStamp()
+	password := base64.StdEncoding.EncodeToString([]byte(data))
 	return password
 }
 func TimeStamp() string {
@@ -45,7 +42,7 @@ func DarajaApi(c *fiber.Ctx) error {
 
 	Consumerkey := os.Getenv("CONSUMERKEY")
 	consumerSecret := os.Getenv("CONSUMERSECRET")
-	Auth := consumerSecret + ":" + Consumerkey
+	//Auth := consumerSecret + ":" + Consumerkey
 
 	//req body json
 
@@ -58,7 +55,7 @@ func DarajaApi(c *fiber.Ctx) error {
 			"message": "Internal server Error.....",
 		})
 	}
-
+	req.Close = true
 	req.SetBasicAuth(Consumerkey, consumerSecret)
 
 	client := &http.Client{}
@@ -89,7 +86,7 @@ func DarajaApi(c *fiber.Ctx) error {
 	fmt.Println("Access token:", accessToken)
 
 	//authenticaton encoding
-	AuthEncode := base64.StdEncoding.EncodeToString([]byte(Auth))
+	//AuthEncode := base64.StdEncoding.EncodeToString([]byte(Auth))
 
 	//writing the post request
 	RequestBody := fmt.Sprintf(`{
@@ -107,18 +104,20 @@ func DarajaApi(c *fiber.Ctx) error {
 
 	//TO-DO send a post request bearing the token,requestbody and
 
-	//***setting up the request headers***
-
-	//set-up the request headers
-	//req.Header.Add("Authorization", "Basic"+AuthEncode)
-	//req.Header.Add("Authorization", "Bearer"+)
-	//req.Header.Add("Content-Type", "application/json")
-	//req.Header.Add("Api_", "application/json")
-	// req.Header.Add("Accept", "application/json")
-	// req.Header.Add("Cache-Control", "no-cache")
+	req2, err := http.NewRequest("POST", BASE_API, bytes.NewBufferString(RequestBody))
+	if err != nil {
+		fmt.Println(err)
+		// return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+		// 	"message": "Internal server Error.....",
+		// })
+	}
+	req2.Header.Set("Authorization", "Bearer"+accessToken)
+	req2.Header.Set("Content-Type", "application/json")
+	req2.Header.Add("Accept", "application/json")
+	req2.Header.Add("Cache-Control", "no-cache")
 	// sending the http req
 
 	return c.Status(200).JSON(fiber.Map{
-		"respbody": body,
+		"message": "transaction was succesful......",
 	})
 }
