@@ -14,9 +14,9 @@ func DarajaApi(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	mpesaApp := mpesa.NewApp(http.DefaultClient, "4T1XbAACROPyDG7np8nBLw2ALRQVsGkL", "qcbSipJSjFvV83Sj", mpesa.Sandbox)
+	mpesaApp := mpesa.NewApp(http.DefaultClient, "", "", mpesa.Sandbox)
 
-	stkPushRes, err := mpesaApp.STKPush(ctx, "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919", mpesa.STKPushRequest{
+	stkPushRes, err := mpesaApp.STKPush(ctx, "", mpesa.STKPushRequest{
 		BusinessShortCode: 174379,
 		TransactionType:   "CustomerPayBillOnline",
 		Amount:            10,
@@ -34,6 +34,6 @@ func DarajaApi(c *fiber.Ctx) error {
 
 	log.Printf("%+v", stkPushRes)
 
-	c.Status(fiber.StatusOK).JSON("sent....")
+	return c.Status(fiber.StatusOK).JSON("sent....")
 
 }
