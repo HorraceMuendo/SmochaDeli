@@ -1,54 +1,120 @@
 package handlers
 
-// func GetRider(c *fiber.Ctx) error {
-// 	Rdb := database.Db
-// 	var riderDetails []riders.RiderDetails
-// 	Rdb.Find(&riderDetails)
-// 	return c.Status(200).JSON(riderDetails)
-// }
+import (
+	database "SmochaDeliveryApp/Database"
+	"SmochaDeliveryApp/model"
+	"fmt"
+	"os"
+	"time"
 
-// func GetRiderById(c *fiber.Ctx) error {
-// 	Rdb := database.Db
-// 	id := c.Params("id")
-// 	var riderDetail []riders.RiderDetails
-// 	match := Rdb.Find(&riderDetail, id)
+	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
+)
 
-// 	if match.RowsAffected == 0 {
-// 		return c.SendStatus(404)
-// 	}
-// 	return c.Status(200).JSON(&riderDetail)
+func SignUpRider(c *fiber.Ctx) error {
 
-// }
-// func CreateRider(c *fiber.Ctx) error {
-// 	Rdb := database.Db
-// 	rider := new(riders.RiderDetails)
-// 	if err := c.BodyParser(rider); err != nil {
-// 		return c.Status(503).SendString(err.Error())
-// 	}
-// 	Rdb.Create(rider)
-// 	return c.Status(200).JSON(rider)
+	var body struct {
+		Firstname string
+		Lastname  string
+		Email     string
+		Phone     uint
+		Location  string
+		Password  string
+	}
+	err := c.BodyParser(&body)
+	if err != nil {
+		fmt.Println("error")
+	}
 
-// }
+	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
+	if err != nil {
+		c.SendStatus(fiber.StatusBadRequest)
 
-// func UpdateRider(c *fiber.Ctx) error {
-// 	Rdb := database.Db
-// 	rider := new(riders.RiderDetails)
-// 	id := c.Params("id")
-// 	if err := c.BodyParser(rider); err != nil {
-// 		return c.Status(503).SendString(err.Error())
-// 	}
-// 	Rdb.Where("id=?", id).Updates(&rider)
-// 	return c.Status(200).JSON(rider)
+	}
+	RiderSignup := model.RiderDetails{
+		Firstname: body.Firstname,
+		Lastname:  body.Lastname,
+		Email:     body.Email,
+		Phone:     body.Phone,
+		Location:  body.Location,
+		Password:  string(hash),
+	}
+	addUser := database.Db.Create(&RiderSignup)
+	if addUser.Error != nil {
+		c.Status(500).JSON("failed to create user")
+	}
 
-// }
-// func DeleteRider(c *fiber.Ctx) error {
-// 	Rdb := database.Db
-// 	var rider riders.RiderDetails
-// 	id := c.Params("id")
-// 	delete := Rdb.Delete(&rider, id)
+	return c.SendStatus(fiber.StatusOK)
+}
 
-// 	if delete.RowsAffected == 0 {
-// 		return c.SendStatus(404)
-// 	}
-// 	return c.SendStatus(200)
-// }
+func LoginRider(c *fiber.Ctx) error {
+
+	var body struct {
+		Firstname string
+		Lastname  string
+		Email     string
+		Phone     uint
+		Location  string
+		Password  string
+	}
+	err := c.BodyParser(&body)
+	if err != nil {
+		c.Status(400).JSON(fiber.Map{
+			"success ?": false,
+			"message":   "bad request",
+		})
+	}
+
+	var RiderLogin model.RiderDetails
+	database.Db.First(&RiderLogin.Email, "email = ?", body.Email)
+	if RiderLogin.ID == 0 {
+		c.Status(400).JSON(fiber.Map{
+			"success ?": false,
+			"message":   "Invalid Email or Password",
+		})
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(RiderLogin.Password), []byte(body.Password))
+	if err != nil {
+		c.Status(400).JSON(fiber.Map{
+			"success ?": false,
+			"message":   "password does not match",
+		})
+	}
+
+	//generating a token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"subject": RiderLogin.ID,
+		"expire":  time.Now().Add(time.Hour * 24 * 30).Unix(),
+	})
+
+	// // Sign and get the complete encoded token as a string using the secret
+	// tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
+
+	// fmt.Println(tokenString, err)
+
+	//signing and encoding
+	tokenString, err := token.SignedString([]byte(os.Getenv("KEY")))
+	if err != nil {
+		c.Status(400).JSON(fiber.Map{
+			"success ?": false,
+			"message":   "token creaton failure",
+		})
+	}
+	//creating a cookie
+	cookie := new(fiber.Cookie)
+	cookie.Name = "Authorization"
+	cookie.Value = tokenString
+	cookie.Expires = time.Now().Add(24 * time.Hour * 30 * 12)
+	c.Cookie(cookie)
+
+	return c.Status(200).JSON("logged in ....")
+
+	//return c.Status(200).JSON("login succesful..."tokenstr)
+}
+func ValidateRider(c *fiber.Ctx) error {
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "congratulations you're logged in",
+	})
+}

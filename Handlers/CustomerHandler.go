@@ -14,7 +14,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func SignUp(c *fiber.Ctx) error {
+func SignUpCustomer(c *fiber.Ctx) error {
 
 	var body struct {
 		Firstname string
@@ -50,7 +50,7 @@ func SignUp(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusOK)
 }
 
-func Login(c *fiber.Ctx) error {
+func LoginCustomer(c *fiber.Ctx) error {
 
 	var body struct {
 		Firstname string
@@ -114,7 +114,7 @@ func Login(c *fiber.Ctx) error {
 
 	//return c.Status(200).JSON("login succesful..."tokenstr)
 }
-func Validate(c *fiber.Ctx) error {
+func ValidateCustomer(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "congratulations you're logged in",
