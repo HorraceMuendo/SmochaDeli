@@ -21,12 +21,15 @@ func Routes() {
 
 	//customers endpoints
 	customer := api.Group("/customers")
-	customer.Post("/signup", handlers.SignUp)
-	customer.Post("/login", handlers.Login)
-	customer.Get("/validate", middleware.AuthBridge, handlers.Validate)
+	customer.Post("/signup", handlers.SignUpCustomer)
+	customer.Post("/login", handlers.LoginCustomer)
+	customer.Get("/validate", middleware.CustomerAuthBridge, handlers.ValidateCustomer)
 
 	//riders endpoints
-	//riders := api.Group("/riders")
+	rider := api.Group("/riders")
+	rider.Post("/signup", handlers.SignUpRider)
+	rider.Post("/login", handlers.LoginRider)
+	rider.Get("/validate", middleware.RiderAuthBridge, handlers.ValidateRider)
 
 	//transactons endpoints
 	transaction := api.Group("/transactions")
@@ -34,15 +37,3 @@ func Routes() {
 	fmt.Println("starting server at port 3000")
 	log.Fatal(app.Listen(os.Getenv("PORT")))
 }
-
-// customer.Get("/getCustomers", handlers.GetCustomer)
-// customer.Get("/getCustomerById", handlers.GetCustomerById)
-// customer.Post("/createCustomer", handlers.GetCustomer)
-// customer.Put("/updateCustomer", handlers.GetCustomer)
-// customer.Delete("/deleteCustomer", handlers.GetCustomer)
-
-// riders.Get("/getRiders", handlers.GetRider)
-// riders.Get("/getRiderById", handlers.GetRiderById)
-// riders.Post("/createRider", handlers.CreateRider)
-// riders.Put("/updateRider", handlers.UpdateRider)
-// riders.Delete("/deleteRider", handlers.DeleteRider)
