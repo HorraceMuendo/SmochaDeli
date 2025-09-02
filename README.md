@@ -1,5 +1,5 @@
 # SmochaDeliveryApp
-A comprehensive api that perfoms crud operations on riders and customers and controls inventory.
+An advanced and scalable API architecture enabling seamless execution of CRUD functionalities for rider and customer datasets, coupled with intelligent inventory management and control mechanisms
 # Database and security
 It's a fully functional web app with connectivity to postgresql.
 The application uses token as a sign in method stored in cookies and prevent unauthorized persons from creating API calls.
